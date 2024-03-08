@@ -1,2 +1,2 @@
 # eldenRing
-All script of Elden Ring
+All script of Elden Ring.
