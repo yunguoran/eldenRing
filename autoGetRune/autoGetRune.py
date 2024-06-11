@@ -4,13 +4,14 @@ import threading
 from pynput import keyboard,mouse
 
 shouldEnd = False
+pressedKeys = []
 kb = keyboard.Controller()
 mo = mouse.Controller()
 
 def main():
     global shouldEnd
     # 键盘监听线程
-    kbListener = keyboard.Listener(on_press=pressKeyboard)
+    kbListener = keyboard.Listener(on_press=onPress,on_release=onRelease)
     kbListener.daemon = 1
 
     # 刷卢恩线程
@@ -21,14 +22,21 @@ def main():
 
     while True:
         if shouldEnd:
+            for key in pressedKeys:
+                kb.release(key)
             return
 
-def pressKeyboard(key):
+def onPress(key):
     global shouldEnd
+    pressedKeys.append(key)
     print('Pressed {0}.'.format(key))
     if key == keyboard.Key.esc:
         shouldEnd = True
         return False
+
+def onRelease(key):
+    pressedKeys.remove(key)
+    print('Release {0}.'.format(key))
 
 def autoGetRune():
     while True:
@@ -44,7 +52,7 @@ def autoGetRune():
         time.sleep(1)
         kb.release('e')
         # 给操作系统一个反应时间，以防止第二次的按键 e 不生效导致无法传送回赐福
-        time.sleep(0.5)
+        time.sleep(0.05)
         kb.press('e')
         time.sleep(1)
         kb.release('e')
